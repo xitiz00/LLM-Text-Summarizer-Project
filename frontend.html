@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Summarizer</title>
+    <!-- Google Fonts - Minecraft-like font -->
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #1e1e2e;
+            --secondary-bg: #2a2a3a;
+            --primary-color: #50fa7b;
+            --secondary-color: #8be9fd;
+            --text-color: #f8f8f2;
+            --button-hover: #bd93f9;
+            --error-color: #ff5555;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            --border-color: #44475a;
+        }
+
+        body {
+            font-family: 'VT323', monospace;
+            line-height: 1.6;
+            color: var(--text-color);
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: var(--bg-color);
+            background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAEsklEQVR4nO2aS5LjIAxAYVbT1ae6jwRH8JHmSOMj9JFmNZs+kqnxIosMGIMkQIDnVU2lO04MeiCEwPDw8PDw8PDw8AgRY5zXdV1gjBP1syAmjHGGMc7btgHGOK/ruvR9T/1YYNi2bXkdgLquqR8LEOu6Lm3b/joAUspFSgn9nKCC1hpprZFSCjaMMUophdaaVEOlFFRKQaUU6OfefQCllOC9vfxcCAGEENB1HaqqQpQaYqU19kFKCeu6AgCAEAIWQiCmdRgppaCUEvq+/z0wx3HAsixQliVijfM4QErJV/HrAD9TSgkP4YmyLKnl7oJzDtq2haIoQEr5WwMvigKapgGMMSIJnHMYxxG6roOiKC4/1zQNFEWBKA/BexHouu7jl9d1DVmWQZ7nYBcJzsFxHGCaJhBCQJqm0Pf9VZECAHj0WsAVdJZlAa01zPMMRVFAVVVXt4jHRYPjOGAYBmiaBoQQkKYp5Hl+tQDyNwB3jgYYY8AYA13XQdu2UNc1VFV1NQTiZwM/UUpBnuchz3OwA3i3BTwqGnDOQSkFXdfB9bJd187/aQGPiAY/AfiXbV13v6r/SwsIPgSkKUJwnQ3eTYKcc9Ba//kSYy94MHZXvuIogmEYBjjncL2u73soigL6voctEQxWf4MxBiEEd7VBu2iwQRDHLHDnXIAxBl3X4aqqHmcfiwZpmgIAAMYYJEnC/9QCbAMwxnA3DYJD7TQM29yfJAnu+/6fS86MvRAQQtwtiL71wbMsA8YYnOcJSqnTLJCkJFqWJVqWBTLGvzVwjDF+vfwkSfDd5HeSJCBJErhbhLZtYRxHGIYBhBCgtcat5/g8EFlCNwEY43AcByilsG1bXJblrz/9F4wxYIzBsixAKYVpmqAfhr+WnEvlsO97mKYJ6rr+9wNwzsE0TZimCYQQDnfvGYQQmOcZhmEAXdeQpilkWXZ3CWy+FoFSCAHjOMLrJ8A4jvcvUAgHzjmM4wjjOEKe5xhjjIuiuFsIoLVx+1UdjogxgGmaDrXdS9EQUBQFTNMEQggIIeBSNNB3gjKMsavmFUa4lAU45+75BURdFFHX9adZIIjsG+N8qZDpcBYgOgBX0x1GmDQE7m6Xr0oZrZQKJvmFMc6Ucx9X6/2VsqZpcJIkOGpDSBLgF4/RWt8sgLTWuK5r4pB3HS4agPQ8H1IqDYIzWKkUEm3b4rZtcdd1sW19wBivnPNLFRo2aOqBQQkBXBIGJQ3Gls4x57zI85znee7yPIdXYBwHuWaO4wBN0wTRTCWFcy5ogwGpYwDnHFJKMaWUoA0H9HdX67pClmVkzQ9dCyhFm6YJurFJYgApJaSUkOc5jeI7+n2UbEgpAUUW4J8Y9x5JGRS0VWAu6boO2raFIK0BVIrP8xxSSoEQgl/9v4NuUbbrfK8JSmUZrR5LKWEcR6CU8jzPeVEUfF95vGWALMugqipu5+XDNoCiKCDP89BtRtE0TSMmZ8MUjeG9tTzPeZqmTlkAbLUwpkXgrrfAJEmCUu4GK7UiUP1D1BZwlgVa+26/4Y48+5u6Zw3xCJT7A76HED882ADfbwd4RK4P8GFKepJ+lR8eHuHyA6hldkxvJEXeAAAAAElFTkSuQmCC');
+        }
+
+        .container {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .input-section, .output-section {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 40px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            letter-spacing: 2px;
+        }
+
+        h2 {
+            color: var(--secondary-color);
+            margin-top: 0;
+            font-size: 28px;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
+        }
+
+        textarea, .output-box {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 18px;
+            min-height: 300px;
+            box-sizing: border-box;
+            background-color: var(--secondary-bg);
+            color: var(--text-color);
+            font-family: 'VT323', monospace;
+            box-shadow: var(--box-shadow);
+        }
+
+        textarea {
+            resize: vertical;
+        }
+
+        .output-box {
+            overflow-y: auto;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: var(--bg-color);
+            border: none;
+            padding: 12px 25px;
+            font-size: 18px;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-top: 15px;
+            transition: all 0.3s;
+            font-family: 'VT323', monospace;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: var(--box-shadow);
+        }
+
+        button:hover {
+            background-color: var(--button-hover);
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        button:disabled {
+            background-color: var(--border-color);
+            cursor: not-allowed;
+        }
+
+        .settings {
+            margin-bottom: 20px;
+            background-color: var(--secondary-bg);
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: var(--box-shadow);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--secondary-color);
+        }
+
+        select {
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'VT323', monospace;
+            font-size: 16px;
+            width: 100%;
+        }
+
+        .length-selector {
+            margin-bottom: 15px;
+        }
+
+        .loading {
+            text-align: center;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border-left-color: var(--primary-color);
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            color: var(--text-color);
+            font-size: 16px;
+            padding: 15px;
+            border-top: 2px solid var(--border-color);
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4);
+        }
+
+        .error {
+            color: var(--error-color);
+            margin-top: 10px;
+            display: none;
+            font-weight: bold;
+        }
+
+        .examples {
+            margin-top: 30px;
+            padding: 15px;
+            background-color: var(--secondary-bg);
+            border-radius: 8px;
+            box-shadow: var(--box-shadow);
+        }
+
+        .examples h3 {
+            margin-top: 0;
+            color: var(--secondary-color);
+        }
+
+        .example-btn {
+            background-color: var(--secondary-bg);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            padding: 8px 15px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'VT323', monospace;
+        }
+
+        .example-btn:hover {
+            background-color: var(--primary-color);
+            color: var(--bg-color);
+            transform: translateY(-2px);
+        }
+        
+        /* Minecraft-inspired blocky hover effect */
+        button:hover, .example-btn:hover {
+            box-shadow: 0 0 0 2px var(--primary-color);
+        }
+        
+        /* Pixel border effect */
+        .pixel-border {
+            position: relative;
+        }
+        
+        .pixel-border::after {
+            content: '';
+            position: absolute;
+            top: -4px;
+            left: -4px;
+            right: -4px;
+            bottom: -4px;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            z-index: -1;
+            border-radius: 12px;
+        }
+    </style>
+</head>
+<body>
+    <h1>AI Text Summarizer</h1>
+    
+    <div class="container">
+        <div class="input-section">
+            <h2>Input Text</h2>
+            <div class="settings pixel-border">
+                <div class="length-selector">
+                    <label for="summary-length">Summary Length:</label>
+                    <select id="summary-length">
+                        <option value="short">Short</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="long">Long</option>
+                    </select>
+                </div>
+                <div class="style-selector">
+                    <label for="summary-style">Summary Style:</label>
+                    <select id="summary-style">
+                        <option value="default" selected>Default</option>
+                        <option value="academic">Academic</option>
+                        <option value="simple">Simple Language</option>
+                        <option value="bullet">Bullet Points</option>
+                    </select>
+                </div>
+            </div>
+            <textarea id="input-text" placeholder="Paste your text here to summarize..."></textarea>
+            <div class="examples pixel-border">
+                <h3>Try an example:</h3>
+                <button class="example-btn" id="example-science">Science Article</button>
+                <button class="example-btn" id="example-business">Business Report</button>
+                <button class="example-btn" id="example-news">News Article</button>
+            </div>
+            <button id="summarize-btn">Summarize</button>
+            <div class="error" id="error-message">Please enter some text to summarize.</div>
+        </div>
+        
+        <div class="output-section">
+            <h2>Summary</h2>
+            <div class="output-box pixel-border" id="output-text">The summary will appear here...</div>
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Generating summary...</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        Built by Kshitiz Singh
+    </div>
+
+    <script>
+        const inputText = document.getElementById('input-text');
+        const outputText = document.getElementById('output-text');
+        const summarizeBtn = document.getElementById('summarize-btn');
+        const summaryLength = document.getElementById('summary-length');
+        const summaryStyle = document.getElementById('summary-style');
+        const loading = document.getElementById('loading');
+        const errorMessage = document.getElementById('error-message');
+
+        // Example texts
+        const examples = {
+            science: `Neural Networks and Deep Learning are revolutionizing artificial intelligence. Deep learning is a subset of machine learning that uses neural networks with many layers to analyze various factors of data. The term "deep" refers to the number of layers through which the data is transformed. Each mathematical manipulation as such is considered a layer. Neural networks were inspired by the human brain, although they function quite differently. The basic unit is the neuron, which receives input from some neurons, processes it, and delivers output to other neurons. Neurons are organized in layers, including an input layer, output layer, and usually one or more hidden layers in between. The connections between neurons have weights that adjust as learning proceeds. The neural network learns by adjusting these weights to reduce the difference between the predicted output and the actual output. This process of learning is called backpropagation, which is a form of gradient descent. Many industries including healthcare, finance, and transportation are utilizing neural networks for tasks such as image recognition, natural language processing, and predictive analytics. As the technology advances, we're finding neural networks tackling increasingly complex problems with remarkable accuracy.`,
+            
+            business: `Fourth Quarter Financial Report for XYZ Corporation. Revenue: The company reported a revenue of $10.5 million, which represents a 15% increase compared to the same quarter last year. This growth exceeded our projected target of 12%. Expenses: Operating expenses were $5.2 million, an increase of 7% year-over-year. This was below our budget of $5.5 million due to effective cost-control measures implemented in the third quarter. Profit: Net profit for the quarter was $3.8 million, marking a 22% increase compared to Q4 last year. This translates to an earnings per share of $0.45. Market Expansion: We successfully entered two new markets in Asia, adding an estimated 500,000 potential customers to our reach. Product Development: Our R&D team completed the beta version of our flagship software product, with full release scheduled for next quarter. Customer Satisfaction: Our NPS (Net Promoter Score) improved from 72 to 78, indicating high customer satisfaction. Challenges: Supply chain disruptions caused delays in hardware product deliveries, affecting about 8% of our orders. We're implementing alternative sourcing strategies to address this issue. Outlook: For the next quarter, we project a revenue growth of 10-12%, with increased investments in R&D and marketing.`,
+            
+            news: `Yesterday, a major climate agreement was signed by 195 countries at the United Nations Climate Conference in Geneva. The landmark deal, called the Geneva Accord, commits nations to reducing carbon emissions by 45% before 2030, a more ambitious target than the previous international agreements. The accord includes financial support mechanisms for developing nations to transition to renewable energy sources. "This is a historic day for our planet," said UN Secretary-General Amara Okafor. "For the first time, we have universal commitment to the kind of rapid action that scientists have been urging for decades." The agreement came after five days of intense negotiations, with major sticking points around timeline commitments and financial responsibilities. The United States and China, as the world's largest carbon emitters, pledged significant emissions cuts and financial contributions to the newly established Climate Transition Fund. Environmental groups cautiously welcomed the accord but noted that implementation and enforcement will be crucial. "The targets are finally in line with scientific consensus, but now comes the hard part - turning promises into action," said Greenpeace director Elena Montoya. Financial markets responded positively to the news, with renewable energy stocks seeing gains while fossil fuel companies experienced moderate declines.`
+        };
+
+        // Load example text
+        document.getElementById('example-science').addEventListener('click', () => {
+            inputText.value = examples.science;
+        });
+
+        document.getElementById('example-business').addEventListener('click', () => {
+            inputText.value = examples.business;
+        });
+
+        document.getElementById('example-news').addEventListener('click', () => {
+            inputText.value = examples.news;
+        });
+
+        // Basic local summarization as fallback
+        function localSummarize(text) {
+            // Simple algorithm to extract important sentences
+            const sentences = text.match(/[^\.!\?]+[\.!\?]+/g) || [];
+            if (sentences.length <= 3) return text;
+            
+            // Get first sentence, a middle sentence, and last sentence
+            return [
+                sentences[0],
+                sentences[Math.floor(sentences.length / 2)],
+                sentences[sentences.length - 1]
+            ].join(' ');
+        }
+
+        // Summarize function
+        summarizeBtn.addEventListener('click', async () => {
+            const text = inputText.value.trim();
+            
+            if (!text) {
+                errorMessage.style.display = 'block';
+                return;
+            }
+            
+            errorMessage.style.display = 'none';
+            loading.style.display = 'block';
+            summarizeBtn.disabled = true;
+            outputText.textContent = 'Generating summary...';
+            
+            try {
+                // Try multiple endpoints with a timeout
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+                
+                const servers = [
+                    'http://localhost:5000/summarize',
+                    'http://127.0.0.1:5000/summarize'
+                ];
+                
+                let success = false;
+                let errorMsg = '';
+                
+                for (const server of servers) {
+                    try {
+                        const response = await fetch(server, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                text: text,
+                                length: summaryLength.value,
+                                style: summaryStyle.value
+                            }),
+                            signal: controller.signal
+                        });
+                        
+                        if (response.ok) {
+                            const data = await response.json();
+                            outputText.textContent = data.summary;
+                            success = true;
+                            break;
+                        } else {
+                            errorMsg = `Server error: ${response.status}`;
+                        }
+                    } catch (fetchError) {
+                        console.error(`Error with ${server}:`, fetchError);
+                        errorMsg = fetchError.message;
+                    }
+                }
+                
+                clearTimeout(timeoutId);
+                
+                if (!success) {
+                    console.warn("All API attempts failed. Using local fallback.");
+                    outputText.textContent = localSummarize(text) + "\n\n(Note: This is a basic summary generated locally because the API service couldn't be reached. For better results, make sure the backend server is running.)";
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                // Fallback to very basic summarization
+                outputText.textContent = localSummarize(text) + "\n\n(Note: This is a basic summary generated locally because the API service couldn't be reached. For better results, make sure the backend server is running.)";
+            } finally {
+                loading.style.display = 'none';
+                summarizeBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
